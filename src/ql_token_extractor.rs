@@ -11,11 +11,18 @@ use yft_service_sdk::external::{
     },
 };
 
+use crate::auth_jwt::AuthJwt;
+
 pub struct ExtractQlBearerToken(pub Option<String>);
 
 impl ExtractQlBearerToken {
     pub fn get_token(&self) -> async_graphql::Result<String> {
-        self.0.clone().ok_or(Error::new("InvalidToken"))
+        self.0.clone().ok_or(Error::new("BearerTokenMissing"))
+    }
+
+    pub fn get_token_as_struct(&self, auth_secret: &str) -> async_graphql::Result<AuthJwt> {
+        let jwt = self.0.clone().ok_or(Error::new("BearerTokenMissing"))?;
+        AuthJwt::verify_token(jwt, auth_secret).map_err(|x| Error::from(x))
     }
 }
 
