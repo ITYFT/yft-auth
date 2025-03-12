@@ -8,7 +8,16 @@ use yft_service_sdk::external::axum::{
     RequestPartsExt,
 };
 
+use crate::auth_jwt::AuthJwt;
+
 pub struct ExtractBearerToken(pub String);
+
+impl ExtractBearerToken {
+    pub fn get_token_as_struct(&self, auth_secret: &str) -> Result<AuthJwt, (StatusCode, String)> {
+        AuthJwt::verify_token(self.0.clone(), auth_secret)
+            .map_err(|x| (StatusCode::UNAUTHORIZED, "Invalid auth token".to_string()))
+    }
+}
 
 impl<S> FromRequestParts<S> for ExtractBearerToken
 where
