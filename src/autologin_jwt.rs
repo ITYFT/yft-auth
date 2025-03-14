@@ -10,16 +10,22 @@ use crate::error::YftAuthError;
 #[derive(Debug, Clone)]
 pub struct AutoLoginJwt {
     pub creads_id: String,
+    pub account: Option<String>,
     pub issue_date: DateTime<Utc>,
     pub expire_date: DateTime<Utc>,
 }
 
 impl AutoLoginJwt {
-    pub fn new(creads_id: &str, expire_date: DateTime<Utc>) -> Self {
+    pub fn new(
+        creads_id: &str,
+        target_account: Option<String>,
+        expire_date: DateTime<Utc>,
+    ) -> Self {
         Self {
             creads_id: creads_id.to_string(),
             issue_date: Utc::now(),
             expire_date,
+            account: target_account,
         }
     }
 
@@ -34,13 +40,20 @@ impl AutoLoginJwt {
         token_jwt.insert("exp", expire_date.as_str());
         token_jwt.insert("_type", "autologin");
 
+        if let Some(target_account) = &self.account {
+            token_jwt.insert("account", target_account.as_str());
+        }
+
         let key: Hmac<Sha256> = Hmac::new_from_slice(secret_key.as_bytes()).unwrap();
         token_jwt
             .sign_with_key(&key)
             .map_err(|_| YftAuthError::InvalidSecretKey)
     }
 
-    pub fn verify_token(token_string: String, secret_key: &str) -> Result<AutoLoginJwt, YftAuthError> {
+    pub fn verify_token(
+        token_string: String,
+        secret_key: &str,
+    ) -> Result<AutoLoginJwt, YftAuthError> {
         let key: Hmac<Sha256> = Hmac::new_from_slice(secret_key.as_bytes()).unwrap();
 
         let token: Token<Header, BTreeMap<String, String>, _> = token_string
@@ -90,6 +103,7 @@ impl AutoLoginJwt {
             creads_id: creads_id,
             issue_date,
             expire_date,
+            account: claims.get("account").cloned(),
         })
     }
 }
@@ -109,6 +123,7 @@ mod test {
             creads_id: "test".to_string(),
             issue_date: Utc::now(),
             expire_date: Utc::now().checked_add_days(Days::new(10)).unwrap(),
+            account: None
         };
 
         let jwt_string = new_token.to_jwt(&secret).unwrap();
@@ -123,5 +138,32 @@ mod test {
         let parsed_jwt = verified_jwt.unwrap();
 
         assert_eq!(new_token.creads_id, parsed_jwt.creads_id);
+        assert!(parsed_jwt.account.is_none());
+    }
+
+    #[test]
+    pub fn test_token_full_flow_with_account() {
+        let secret = "test_secret";
+
+        let new_token = AutoLoginJwt {
+            creads_id: "test".to_string(),
+            issue_date: Utc::now(),
+            expire_date: Utc::now().checked_add_days(Days::new(10)).unwrap(),
+            account: Some("testid".to_string())
+        };
+
+        let jwt_string = new_token.to_jwt(&secret).unwrap();
+        println!("Token: {}", jwt_string);
+
+        let failed_signed_jwt = new_token.to_jwt("bad_secret").unwrap();
+        assert!(AutoLoginJwt::verify_token(failed_signed_jwt, secret).is_err());
+
+        let verified_jwt = AutoLoginJwt::verify_token(jwt_string, secret);
+        assert!(verified_jwt.is_ok());
+
+        let parsed_jwt = verified_jwt.unwrap();
+
+        assert_eq!(new_token.creads_id, parsed_jwt.creads_id);
+        assert_eq!(parsed_jwt.account.unwrap(), "testid".to_string());
     }
 }
