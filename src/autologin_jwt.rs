@@ -123,7 +123,7 @@ mod test {
             creads_id: "test".to_string(),
             issue_date: Utc::now(),
             expire_date: Utc::now().checked_add_days(Days::new(10)).unwrap(),
-            account: None
+            account: None,
         };
 
         let jwt_string = new_token.to_jwt(&secret).unwrap();
@@ -149,7 +149,7 @@ mod test {
             creads_id: "test".to_string(),
             issue_date: Utc::now(),
             expire_date: Utc::now().checked_add_days(Days::new(10)).unwrap(),
-            account: Some("testid".to_string())
+            account: Some("testid".to_string()),
         };
 
         let jwt_string = new_token.to_jwt(&secret).unwrap();

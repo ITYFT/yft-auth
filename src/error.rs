@@ -1,3 +1,4 @@
+#[cfg(feature = "ql")]
 use yft_service_sdk::external::async_graphql;
 
 #[derive(Debug, Clone)]
@@ -12,6 +13,7 @@ impl YftAuthError {
     }
 }
 
+#[cfg(feature = "ql")]
 impl From<YftAuthError> for async_graphql::Error {
     fn from(value: YftAuthError) -> Self {
         Self::new(value.as_err_str())
