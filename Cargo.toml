@@ -1,17 +1,17 @@
 [package]
 name = "yft-auth"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [features]
-default = []
+default = ["ql", "axum"]
 
 ql = ["dep:yft-service-sdk", "yft-service-sdk/ql"]
 axum = ["dep:yft-service-sdk", "dep:axum-extra"]
 
 
 [dependencies]
-yft-service-sdk = { git = "https://github.com/ITYFT/yft-service-sdk.git", optional = true, features = [
+yft-service-sdk = { git = "https://github.com/ITYFT/yft-service-sdk.git", tag = "0.1.9", optional = true, features = [
     "ql",
 ] }
 
@@ -19,4 +19,4 @@ chrono = "*"
 jwt = "*"
 hmac = "*"
 sha2 = "*"
-axum-extra = { version = "*", optional = true, features = ["typed-header"] }
+axum-extra = { version = "0.9.6", optional = true, features = ["typed-header"] }

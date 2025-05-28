@@ -1,11 +1,11 @@
 use axum_extra::{
-    headers::{authorization::Bearer, Authorization},
     TypedHeader,
+    headers::{Authorization, authorization::Bearer},
 };
 use yft_service_sdk::external::axum::{
+    RequestPartsExt, async_trait,
     extract::FromRequestParts,
-    http::{request::Parts, StatusCode},
-    RequestPartsExt,
+    http::{StatusCode, request::Parts},
 };
 
 use crate::auth_jwt::AuthJwt;
@@ -19,6 +19,7 @@ impl ExtractBearerToken {
     }
 }
 
+#[async_trait]
 impl<S> FromRequestParts<S> for ExtractBearerToken
 where
     S: Send + Sync,

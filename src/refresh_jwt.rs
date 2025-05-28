@@ -107,8 +107,8 @@ impl RefreshJwt {
 
 #[cfg(test)]
 mod test {
-    use chrono::{Days, Duration, Utc};
-    use jwt::VerifyWithKey;
+    use chrono::{Days, Utc};
+    
 
     use super::RefreshJwt;
 

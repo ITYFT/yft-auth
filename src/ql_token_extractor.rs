@@ -5,9 +5,7 @@ use axum_extra::{
 use yft_service_sdk::external::{
     async_graphql::{self, Error},
     axum::{
-        extract::FromRequestParts,
-        http::{request::Parts, StatusCode},
-        RequestPartsExt,
+        async_trait, extract::FromRequestParts, http::{request::Parts, StatusCode}, RequestPartsExt
     },
 };
 
@@ -26,6 +24,7 @@ impl ExtractQlBearerToken {
     }
 }
 
+#[async_trait]
 impl<S> FromRequestParts<S> for ExtractQlBearerToken
 where
     S: Send + Sync,
