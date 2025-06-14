@@ -11,7 +11,7 @@ axum = ["dep:yft-service-sdk", "dep:axum-extra"]
 
 
 [dependencies]
-yft-service-sdk = { optional = true, git = "https://github.com/ITYFT/yft-service-sdk.git", tag = "0.1.11", features = [
+yft-service-sdk = { optional = true, git = "https://github.com/ITYFT/yft-service-sdk.git", tag = "0.1.18", features = [
     "ql",
 ] }
 
