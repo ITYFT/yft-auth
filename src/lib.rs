@@ -1,6 +1,7 @@
 pub mod auth_jwt;
 pub mod refresh_jwt;
 pub mod error;
+pub mod tg_login_jwt;
 #[cfg(feature = "axum")]
 pub mod http_token_extractor;
 #[cfg(feature = "ql")]
